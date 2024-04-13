@@ -1,24 +1,20 @@
-const adminCredential = require("../../models/Admin/credential.model.js");
+const userCredential = require("../../models/userCredential.model.js");
 
 const loginHandler = async (req, res) => {
     let { loginid, password } = req.body;
     try {
-        let user = await adminCredential.findOne({ loginid });
-        if (!user) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Wrong Credentials" });
-        }
-        if (password !== user.password) {
+        let user = await userCredential.findOne({ loginid });
+        if (!user || password !== user.password) {
             return res
                 .status(400)
                 .json({ success: false, message: "Wrong Credentials" });
         }
         const data = {
             success: true,
-            message: "Login Successfull!",
+            message: "Login Successful!",
             loginid: user.loginid,
             id: user.id,
+            role: user.role,
         };
         res.json(data);
     } catch (error) {
@@ -28,24 +24,26 @@ const loginHandler = async (req, res) => {
 }
 
 const registerHandler = async (req, res) => {
-    let { loginid, password } = req.body;
+    let { loginid, password, role } = req.body;
     try {
-        let user = await adminCredential.findOne({ loginid });
+        let user = await userCredential.findOne({ loginid, role });
         if (user) {
             return res.status(400).json({
                 success: false,
-                message: "Admin With This LoginId Already Exists",
+                message: "User With This LoginId Already Exists",
             });
         }
-        user = await adminCredential.create({
+        user = await userCredential.create({
             loginid,
             password,
+            role,
         });
         const data = {
             success: true,
-            message: "Register Successfull!",
+            message: "Register Successful!",
             loginid: user.loginid,
             id: user.id,
+            role: user.role,
         };
         res.json(data);
     } catch (error) {
@@ -56,16 +54,16 @@ const registerHandler = async (req, res) => {
 
 const updateHandler = async (req, res) => {
     try {
-        let user = await adminCredential.findByIdAndUpdate(req.params.id, req.body);
+        let user = await userCredential.findByIdAndUpdate(req.params.id, req.body);
         if (!user) {
             return res.status(400).json({
                 success: false,
-                message: "No Admin Exists!",
+                message: "No User Exists!",
             });
         }
         const data = {
             success: true,
-            message: "Updated Successfull!",
+            message: "Updated Successful!",
         };
         res.json(data);
     } catch (error) {
@@ -76,16 +74,16 @@ const updateHandler = async (req, res) => {
 
 const deleteHandler = async (req, res) => {
     try {
-        let user = await adminCredential.findByIdAndDelete(req.params.id);
+        let user = await userCredential.findByIdAndDelete(req.params.id);
         if (!user) {
             return res.status(400).json({
                 success: false,
-                message: "No Admin Exists!",
+                message: "No User Exists!",
             });
         }
         const data = {
             success: true,
-            message: "Deleted Successfull!",
+            message: "Deleted Successful!",
         };
         res.json(data);
     } catch (error) {

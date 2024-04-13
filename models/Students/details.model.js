@@ -39,6 +39,11 @@ const studentDetails = new mongoose.Schema({
   profile: {
     type: String,
     required: true,
+  },
+  role:{
+    type: String,
+    required: true,
+    enum: ['student']
   }
 }, { timestamps: true });
 
