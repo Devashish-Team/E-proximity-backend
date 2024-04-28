@@ -4,16 +4,9 @@ const loginHandler = async (req, res) => {
     let { loginid, password } = req.body;
     try {
         let user = await facultyCredential.findOne({ loginid });
-        if (!user) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Wrong Credentials" });
-        }
-        if (password !== user.password) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Wrong Credentials" });
-        }
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ message: "Invalid username or password" });
+          }
         const data = {
             success: true,
             message: "Login Successfull!",
@@ -37,9 +30,10 @@ const registerHandler = async (req, res) => {
                 message: "User With This LoginId Already Exists",
             });
         }
+        const hashedPassword = await bcrypt.hash(password, 10);
         user = await facultyCredential.create({
             loginid,
-            password,
+            hashedPassword,
         });
         const data = {
             success: true,

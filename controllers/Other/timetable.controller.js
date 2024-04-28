@@ -2,6 +2,8 @@ const Timetable = require("../../models/Other/timetable.model");
 
 const getTimetable = async (req, res) => {
     try {
+
+        
         let timetable = await Timetable.find(req.body);
         if (timetable) {
             res.json(timetable);
